@@ -1,20 +1,18 @@
 import re
 world = []
-size = True
-def loadregion(abbr):
+size = True #Should the program take number of rooms into account when pathing?
+def loadregion(abbr): #loads the rooms in a region, and then compacts them into shelter zones. Returns a list of shelters.
   worldfile = open('world_'+abbr.lower()+".txt",'r')
   region = []
   shelters = []
   while True:
-    
     line = worldfile.readline()
     line = re.split('\n',line)[0]
-    if(line == "END ROOMS"):
+    if(line == "END ROOMS"): #'END ROOMS' is, as expected, the end of the list of rooms. We don't want to read more data after this point in the file.
       break
     linesplit = re.split(' : ',line)
     if(len(linesplit)>=2):
       linesplit[1] = list(filter(None,re.split(', |DISCONNECTED',linesplit[1])))
-      
       if(len(linesplit)==2):
         linesplit.append("NORMAL")
       elif(linesplit[2]=="ANCIENTSHELTER" or linesplit[2]=="SHELTER"):
@@ -25,10 +23,10 @@ def loadregion(abbr):
         linesplit[2] = "GATE"
       else:
         linesplit[2] = "NORMAL"
-  #    print(linesplit)
       region.append(linesplit)
   while expand(shelters,region):
     pass
+  worldfile.close()
   return(shelters)
 
 def expand(shelters, region):
@@ -98,7 +96,6 @@ def worldfix(world):
           if found:
             break
   return world      
-#print world
 
 
 
@@ -131,7 +128,6 @@ def makeweb(world, size):
       web.append(node)
   return web
 
-
 #print web
 def dijkstra(web, start, target):
   Q = web[:]
@@ -148,8 +144,7 @@ def dijkstra(web, start, target):
         min = node[2]
         current = node
     R.append(current)
-    Q.remove(current)
-    
+    Q.remove(current) 
     
     if current[0] == target:
       traceback = current
@@ -161,7 +156,6 @@ def dijkstra(web, start, target):
         for node in R:
           if node[0] == traceback[3]:
             traceback = node
-        
     
     for neighbor in current[1]:
       for node in Q:
@@ -172,6 +166,7 @@ def dijkstra(web, start, target):
             node[3] = current[0]
           break
     
+# Hardcoded weights!
 weights = [["SU",.1],["HI",.1],["CC",.25],["GW",.4],["SH",1],["SL",.4],["UW",.3],["DS",.25],["SS",.6],["LF",.7],["SB",.7],["SI",.7]]
 for region in weights:
   world += loadregion(region[0])
