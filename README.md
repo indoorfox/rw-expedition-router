@@ -6,6 +6,7 @@ Cannot presently read modify files (and therefore does not interpret MSC changes
 Currently uses a pre-set list of weights.
 
 Current 'to-be-implemented' features list:
+
 -Asking for input on weights (and then normalising them before using them)
 -Reading the modify files that MSC uses to change existing regions
 -Actually reading the filestructure as it is on an actual machine
