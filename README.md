@@ -1,7 +1,7 @@
 # rw-expedition-router
 A tool for routing from one location to another in Rain World.
 
-Currently expects to be placed in your `RainWorld_Data` directory.
+Currently expects main.py to be placed directly in your `RainWorld_Data` directory.
 Cannot presently read modify files (and therefore does not interpret MSC changes).
 Currently requires shelter names to be exactly as they appear in the game's files.
 
