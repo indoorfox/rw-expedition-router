@@ -1,8 +1,11 @@
 import re
+import os
+rw_data = os.path.dirname(__file__)
 world = []
 size = True #Should the program take number of rooms into account when pathing?
 def loadregion(abbr): #loads the rooms in a region, and then compacts them into shelter zones. Returns a list of shelters.
-  worldfile = open('world_'+abbr.lower()+".txt",'r')
+  worldlocation = os.path.join(rw_data, "StreamingAssets","world", abbr.lower(), ("world_" + abbr.lower() + ".txt"))
+  worldfile = open(worldlocation,'r')
   region = []
   shelters = []
   while True:
@@ -160,11 +163,11 @@ def dijkstra(web, start, target): #runs Dijstra's algorithm to connect a given s
             node[2] = alt
             node[3] = current[0]
           break
-    
-# Hardcoded weights! Change this to a user query of some kind later.
+        
 weights = [["SU",.1],["HI",.1],["CC",.25],["GW",.4],["SH",1],["SL",.4],["UW",.3],["DS",.25],["SS",.6],["LF",.7],["SB",.7],["SI",.7]]
 for region in weights:
   world += loadregion(region[0])
+  region[1] = int(input("Please input a difficulty value for "+region[0]+": "))
 world = worldfix(world)
 applyweights(world, weights)
 web = makeweb(world, size)
