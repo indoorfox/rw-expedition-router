@@ -14,7 +14,7 @@ Current 'to-be-implemented' features list:
 - Actually reading the filestructure as it is on an actual machine [DONE]
 - Allowing a user to specify a name other than the exact room name of a given shelter as a start or end point
 - Allowing the user to select which slugcat they are playing as and change the map accordingly
-- Paying attention to one-way connections (This'll be a little bit tricky so don't your fingers too soon.)
+- Paying attention to one-way connections (This'll be a little bit tricky so don't cross your fingers too soon.)
 - Having alternate, more descriptive names for shelters // shelter zones (like 'new player tutorial shelter' instead of 'SU_S01')
 - A visual, rather than text-based interface
 - Allowing a user to set by-subregion or by-shelter weights
