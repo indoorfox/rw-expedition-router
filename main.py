@@ -1,10 +1,10 @@
 import re
 import os
-rw_data = os.path.dirname(__file__)
+rw_data = input("Input the path to your RainWorld_Data directory (including the folder itself) : ")
 world = []
 size = True #Should the program take number of rooms into account when pathing?
 def loadregion(abbr): #loads the rooms in a region, and then compacts them into shelter zones. Returns a list of shelters.
-  worldlocation = os.path.join(rw_data, "StreamingAssets","world", abbr.lower(), ("world_" + abbr.lower() + ".txt"))
+  worldlocation = os.path.join(rw_data, "StreamingAssets", "world", abbr.lower(), ("world_" + abbr.lower() + ".txt"))
   worldfile = open(worldlocation,'r')
   region = []
   shelters = []
