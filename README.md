@@ -1,12 +1,11 @@
 # rw-expedition-router
 A tool for routing from one location to another in Rain World.
 
-Currently expects main.py to be placed directly in your `RainWorld_Data` directory.
 Cannot presently read modify files (and therefore does not interpret MSC changes).
 Currently requires shelter names to be exactly as they appear in the game's files.
 
-Asks for a list of 'difficulty' values, one for each region, to weight decisions, and then asks for a starting and ending shelter name.
-Then it outputs a list of shelters to pass by to get from the given starting shelter to the given ending shelter in the 'easiest' way.
+Asks for the location of your `RainWorld_Data` directory, then asks for a list of 'difficulty' values, one for each region, to weight decisions, and then asks for a starting and ending shelter name.
+Using that, it outputs a list of shelters to pass by to get from the given starting shelter to the given ending shelter in the 'easiest' way.
 
 Current 'to-be-implemented' features list:
 
