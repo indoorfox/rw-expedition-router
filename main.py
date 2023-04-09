@@ -1,35 +1,118 @@
 import re
 import os
 rw_data = input("Input the path to your RainWorld_Data directory (including the folder itself) : ")
+reg_world = os.path.join(rw_data, "StreamingAssets", "world")
+msc_world = os.path.join(rw_data, "StreamingAssets", "mods", "moreslugcats", "world")
+msc_modify = os.path.join(rw_data, "StreamingAssets", "mods", "moreslugcats", "modify", "world")
 world = []
 size = True #Should the program take number of rooms into account when pathing?
+def slugcatpicker(slugcat): #takes in user input and outpits slugcat-relevant variables [list of regions, slugcat in-file name]
+  weights = [["SU"], ["HI"], ["CC"], ["SI"], ["LF"], ["SB"], ["GW"], ["VS"]]
+  if "surv" in slugcat.lower():
+    weights += [["OE"], ["MS"], ["UW"], ["SS"], ["SH"], ["DS"], ["SL"]]
+    conditional = "White"
+  elif "monk" in slugcat.lower():
+    weights += [["OE"], ["MS"], ["UW"], ["SS"], ["SH"], ["DS"], ["SL"]]
+    conditional = "Yellow"
+  elif "hunt" in slugcat.lower():
+    weights += [["MS"], ["UW"], ["SS"], ["SH"], ["DS"], ["SL"]]
+    conditional = "Red"
+  elif "gour" in slugcat.lower():
+    weights += [["OE"], ["MS"], ["UW"], ["SS"], ["SH"], ["DS"], ["SL"]]
+    conditional = "Gourmand"
+  elif "arti" in slugcat.lower():
+    weights += [["LC"], ["LM"], ["UW"], ["SS"], ["SH"], ["DS"]]
+    conditional = "Artificer"
+  elif "riv" in slugcat.lower():
+    weights += [["MS"], ["UW"], ["RM"], ["SH"], ["DS"], ["SL"]]
+    conditional = "Rivulet"
+  elif "spear" in slugcat.lower():
+    weights += [["DM"], ["UW"], ["SS"], ["SH"], ["DS"], ["LM"]]
+    conditional = "White"
+  elif "saint" in slugcat.lower():
+    weights += [["MS"], ["CL"], ["UG"], ["SL"], ["HR"]]
+    conditional = "White"
+  elif ("inv" in slugcat.lower()) or ("enot" in slugcat.lower()) or ("?" in slugcat.lower()):
+    weights += [["OE"], ["MS"], ["UW"], ["SS"], ["SH"], ["DS"], ["SL"]]
+    conditional = "White"
+  else:
+    return [[],"UNRECOGNIZED"]
+  return [weights,conditional]
+    
 def loadregion(abbr): #loads the rooms in a region, and then compacts them into shelter zones. Returns a list of shelters.
-  worldlocation = os.path.join(rw_data, "StreamingAssets", "world", abbr.lower(), ("world_" + abbr.lower() + ".txt"))
-  worldfile = open(worldlocation,'r')
+  worldlocation = os.path.join(reg_world, abbr.lower(), "world_"+abbr.lower()+".txt")
+  modify = False
+  if os.path.exists(worldlocation):
+    modify = True
+  else:
+    worldlocation = os.path.join(msc_world, abbr.lower(), "world_"+abbr.lower()+".txt")
+  worldfile = open(worldlocation, 'r')
   region = []
   shelters = []
   while True:
     line = worldfile.readline()
-    line = re.split('\n',line)[0]
+    line = re.split('\n', line)[0]
     if(line == "END ROOMS"): #'END ROOMS' is, as expected, the end of the list of rooms. We don't want to read more data after this point in the file.
       break
-    linesplit = re.split(' : ',line)
+    linesplit = re.split(' : ', line)
     if(len(linesplit)>=2):
-      linesplit[1] = list(filter(None,re.split(', |DISCONNECTED',linesplit[1])))
+      linesplit[1] = list(filter(None, re.split(', |DISCONNECTED', linesplit[1])))
       if(len(linesplit)==2):
         linesplit.append("NORMAL")
       elif(linesplit[2]=="ANCIENTSHELTER" or linesplit[2]=="SHELTER"):
         linesplit[2] = "SHELTER"
-        shelter = [abbr,linesplit[0],linesplit[1],[linesplit[0]],[]]
+        shelter = [abbr, linesplit[0], linesplit[1], [linesplit[0]], []]
         shelters.append(shelter)
       elif(linesplit[2]=="GATE"):
         linesplit[2] = "GATE" #This is a specific case in case I need to do something with these later.
       else:
         linesplit[2] = "NORMAL"
       region.append(linesplit)
-  while expand(shelters,region): 
-    pass
   worldfile.close() #Don't need this still in memory!
+  if modify: #regions that are in the base game have a 'modify' file we'll need to interpret to get their MSC changes.
+    modfile = open(os.path.join(msc_modify, abbr.lower(), "world_"+abbr.lower()+".txt"))
+    test = True
+    while True:
+      line = re.split('\n', modfile.readline())[0]
+      if test:
+        if line=="ROOMS":
+          test = False
+          continue
+        elif line == "[ENDMERGE]":
+          break
+        else:
+          continue
+      if(line == "END ROOMS"): 
+        break
+      linesplit = re.split(' : ', line)
+      if(len(linesplit)>=2):
+        linesplit[1] = list(filter(None, re.split(', |DISCONNECTED', linesplit[1])))
+        if(len(linesplit)==2):
+          linesplit.append("NORMAL")
+        elif(linesplit[2]=="ANCIENTSHELTER" or linesplit[2]=="SHELTER"):
+          linesplit[2] = "SHELTER"
+          shelter = [abbr, linesplit[0], linesplit[1], [linesplit[0]], []]
+          temp = False
+          for room in shelters:
+            if room[1]==linesplit[0]:
+              room[2] = linesplit[1]
+              temp = True
+          if not temp:  
+            shelters.append(shelter)
+        elif(linesplit[2]=="GATE"):
+          linesplit[2] = "GATE" 
+        else:
+          linesplit[2] = "NORMAL"
+        for room in region: #if we already have the room, that means the modify file is just here to change its properties. Apply those.
+          if room[0]==linesplit[0]:
+            room[1] = linesplit[1]
+            room[2] = linesplit[2]
+            continue
+        region.append(linesplit) #if we don't already have it, add it in.
+  
+  
+  while expand(shelters, region): 
+    pass
   return(shelters)
 
 def expand(shelters, region): #expands the search boundary for each shelter zone. Returns false once no more shelters have room to expand.
@@ -114,7 +197,7 @@ def makeweb(world, size): #prepares the web of connected shelters for use with D
         for search in world:
           if search[1]==connection:
             weight = (shelter[0] * len(shelter[3])) + (search[0]*len(search[3])) #uses number of rooms in a shelter zone as a rough estimate of how long it'll take to travel through it.
-        node[1].append([connection,weight])
+        node[1].append([connection, weight])
       web.append(node)
   else:
     for shelter in world:
@@ -123,7 +206,7 @@ def makeweb(world, size): #prepares the web of connected shelters for use with D
         for search in world:
           if search[1]==connection:
             weight = (shelter[0]) + (search[0]) #uses raw weights instead of modifying them by estimated length.
-        node[1].append([connection,weight])
+        node[1].append([connection, weight])
       web.append(node)
   return web
 
@@ -141,6 +224,9 @@ def dijkstra(web, start, target): #runs Dijstra's algorithm to connect a given s
       if node[2] < min:
         min = node[2]
         current = node
+    if current == []:
+      print("Sorry, that route doesn't seem to be possible!")
+      return []
     R.append(current) #removes it from the list of unsearched and saves it in our searched list so we can use it for traceback later.
     Q.remove(current) 
     
@@ -164,31 +250,51 @@ def dijkstra(web, start, target): #runs Dijstra's algorithm to connect a given s
             node[3] = current[0]
           break
         
-weights = [["SU",.1],["HI",.1],["CC",.25],["GW",.4],["SH",1],["SL",.4],["UW",.3],["DS",.25],["SS",.6],["LF",.7],["SB",.7],["SI",.7]]
-for region in weights:
-  world += loadregion(region[0])
-  region[1] = int(input("Please input a difficulty value for "+region[0]+": "))
-world = worldfix(world)
-applyweights(world, weights)
-web = makeweb(world, size)
+weights = [["SU", .1], ["HI", .1], ["CC", .25], ["GW", .4], ["SH", 1], ["SL", .4], ["UW", .3], ["DS", .25], ["SS", .6], ["LF", .7], ["SB", .7], ["SI", .7], ["OE", .6], ["RM", .9], ["DM", .5], ["MS", 1], ["CL", .5], ["HR", .3], ["LC", .5], ["LM", .4], ["UG", .5], ["VS", .6]] #weights in here are 'defaults' although that's not actually implemented
+conditional = ""
 while True:
-  found = False
-  start = input("Input origin shelter name: ")
-  for shelter in world:
-    if start == shelter[1]:
-      found = True
+  world = []
+  while True:
+    slugcat = input("Which slugcat are you playing as?")
+    temp = slugcatpicker(slugcat)
+    weights = temp[0]
+    conditional = temp[1]
+    if conditional == "UNRECOGNIZED":
+      print("Sorry, I don't recognize that slugcat.")
+    else:
       break
-  if found:
-    break
-  print("Shelter name not recognized. Please try again.\n")
-while True:
-  found = False
-  end = input("Input destination shelter name: ")
-  for shelter in world:
-    if end == shelter[1]:
-      found = True
+  for region in weights:
+    world += loadregion(region[0])
+    while True:
+      temp = input("Please input a difficulty value for "+region[0]+": ")
+      if temp.isnumeric():
+        region.append(int())
+        break
+      else:
+        print("That's not a number!")
+  world = worldfix(world)
+  applyweights(world, weights)
+  web = makeweb(world, size)
+  while True:
+    found = False
+    start = input("Input origin shelter name: ")
+    for shelter in world:
+      if start == shelter[1]:
+        found = True
+        break
+    if found:
       break
-  if found:
+    print("Shelter name not recognized. Please try again.\n")
+  while True:
+    found = False
+    end = input("Input destination shelter name: ")
+    for shelter in world:
+      if end == shelter[1]:
+        found = True
+        break
+    if found:
+      break
+    print("Shelter name not recognized. Please try again.\n")
+  print(dijkstra(web, start, end))
+  if input("type QUIT to exit: ") == "QUIT":
     break
-  print("Shelter name not recognized. Please try again.\n")
-print(dijkstra(web, start,end))
