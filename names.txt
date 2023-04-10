@@ -1,0 +1,88 @@
+REGIONS:
+CC - Chimney Canopy
+CL - Silent Construct
+DM - Looks to the Moon
+DS - Drainage System
+GW - Garbage Wastes
+HI - Industrial Complex
+HR - Rubicon
+LC - Metropolis
+LF - Farm Arrays
+LM - Waterfront Facility
+MS - Submerged Superstructure
+OE - Outer Expanse
+RM - The Rot
+SB - Subterranean
+SH - Shaded Citadel
+SI - Sky Islands
+SL - Shoreline
+SS - Five Pebbles
+SU - Outskirts
+UG - Undergrowth
+UW - The Exterior
+VS - Pipeyard
+
+SAINTREGIONS:
+CC - Solitary Towers
+CL - Silent Construct
+DM - how are you here??
+DS - wait this is undergrowth
+GW - Glacial Wasteland
+HI - Icy Monument
+HR - Rubicon
+LC - this is super destroyed no
+LF - Desolate Fields
+LM - this is shoreline (and cold) now
+MS - Submerged Superstructure
+OE - jungle but cold
+RM - boo womp funny long legs are dead
+SB - Primordial Underground
+SH - *metal pipe sound*
+SI - Windswept Spires
+SL - Frigid Coast
+SS - loser who is on the floor
+SU - Suburban Drifts
+UG - Undergrowth
+UW - cracked open like an egg
+VS - Barren Conduits
+
+INVREGIONS:
+CC - Chimney Canopy
+CL - you're not supposed to be here
+DM - shhh she's sleeping
+DS - Painage System
+GW - Nachos Will Never Be The Same
+HI - Industrial Complex
+HR - hell
+LC - milf zone
+LF - Farm Arrays
+LM - the past
+MS - Submerged Superstructure
+OE - the colony
+RM - rip bozo
+SB - Subterranean
+SH - Shaded Citadel
+SI - Sky Islands
+SL - Shoreline
+SS - Five Pebbles
+SU - we forgot to render this one sorry
+UG - old pains
+UW - The Exterior
+VS - TOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOBS
+
+SHELTERS:
+
+ROOMS:
+White - SU_C04
+Yellow - SU_C04
+Red - LF_H01
+Gourmand - SH_GOR02
+Artificer - GW_A24
+Rivulet - DS_RIVSTART
+Spear - SU_INTRO01
+Saint - SI_SAINTINTRO
+tutorial - SU_C04
+moon - SL_AI
+spearmoon - DM_AI
+pebbles - SS_AI
+saintpebbles - CL_AI

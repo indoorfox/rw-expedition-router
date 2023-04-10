@@ -28,13 +28,13 @@ def slugcatpicker(slugcat): #takes in user input and outpits slugcat-relevant va
     conditional = "Rivulet"
   elif "spear" in slugcat.lower():
     weights += [["DM"], ["UW"], ["SS"], ["SH"], ["DS"], ["LM"]]
-    conditional = "White"
+    conditional = "Spear"
   elif "saint" in slugcat.lower():
     weights += [["MS"], ["CL"], ["UG"], ["SL"], ["HR"]]
-    conditional = "White"
+    conditional = "Saint"
   elif ("inv" in slugcat.lower()) or ("enot" in slugcat.lower()) or ("?" in slugcat.lower()):
     weights += [["OE"], ["MS"], ["UW"], ["SS"], ["SH"], ["DS"], ["SL"]]
-    conditional = "White"
+    conditional = "Inv"
   else:
     return [[],"UNRECOGNIZED"]
   return [weights,conditional]
@@ -109,11 +109,61 @@ def loadregion(abbr): #loads the rooms in a region, and then compacts them into 
             room[2] = linesplit[2]
             continue
         region.append(linesplit) #if we don't already have it, add it in.
-  
-  
+  if modify:
+    conditionalinterpret(shelters, region, os.path.join(msc_modify, abbr.lower(), "world_"+abbr.lower()+".txt"))
+  else:
+    conditionalinterpret(shelters, region, os.path.join(msc_world, abbr.lower(), "world_"+abbr.lower()+".txt"))
   while expand(shelters, region): 
     pass
   return(shelters)
+
+def conditionalinterpret(shelters, region, fileloc):
+  file = open(fileloc, mode='r')
+  test = True
+  while True:
+    line = re.split('\n', file.readline())[0]
+    if test:
+      if line=="CONDITIONAL LINKS":
+        test= False
+        continue
+      elif line=="[ENDMERGE]" or line=="CREATURES":
+        break
+      else:
+        continue
+    if line=="END CONDITIONAL LINKS":
+      break
+    linesplit = re.split(' : ',line)
+    if len(linesplit) >= 2:
+      if linesplit[1]=="EXCLUSIVEROOM":
+        if not conditional==linesplit[0]:
+          for shelter in shelters:
+            if shelter[1]==linesplit[2]:
+              shelters.remove(shelter)
+          for room in region:
+            if room[0]==linesplit[2]:
+              region.remove(room)
+      if linesplit[0]==conditional:
+        if linesplit[1]=="HIDEROOM":
+          for shelter in shelters:
+            if shelter[1]==linesplit[2]:
+              shelters.remove(shelter)
+          for room in region:
+            if room[0]==linesplit[2]:
+              region.remove(room)
+        else:
+          if linesplit[2].isnumeric():
+            for room in region:
+              if room[0]==linesplit[1]:
+                room[1].append(linesplit[3])
+          else:
+            for room in region:
+              if room[0]==linesplit[1]:
+                for connection in room[1]:
+                  if connection==linesplit[2]:
+                    room[1].remove(linesplit[2])
+                if not linesplit[3]=="DISCONNECTED":
+                  room[1].append(linesplit[3])
+  return
 
 def expand(shelters, region): #expands the search boundary for each shelter zone. Returns false once no more shelters have room to expand.
   numsearching = 0
@@ -268,13 +318,16 @@ while True:
     while True:
       temp = input("Please input a difficulty value for "+region[0]+": ")
       if temp.isnumeric():
-        region.append(int())
+        region.append(int(temp))
         break
       else:
         print("That's not a number!")
   world = worldfix(world)
   applyweights(world, weights)
   web = makeweb(world, size)
+  for node in web:
+    print(node)
+    print("\n")
   while True:
     found = False
     start = input("Input origin shelter name: ")
