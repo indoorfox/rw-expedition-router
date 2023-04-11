@@ -86,3 +86,5 @@ moon - SL_AI
 spearmoon - DM_AI
 pebbles - SS_AI
 saintpebbles - CL_AI
+
+END NAMES

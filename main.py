@@ -6,6 +6,34 @@ msc_world = os.path.join(rw_data, "StreamingAssets", "mods", "moreslugcats", "wo
 msc_modify = os.path.join(rw_data, "StreamingAssets", "mods", "moreslugcats", "modify", "world")
 world = []
 size = True #Should the program take number of rooms into account when pathing?
+
+def parseroom(room, shelters, aliases): #interprets room input as a shelter
+  if 'start' in room.lower():
+    room = conditional
+  if 'moon' in room.lower() or 'lttm' in room.lower():
+    if conditional=="Spear":
+      room = "spearmoon"
+    else:
+      room = "moon"
+  if 'pebbles' in room.lower() or 'fp' in room.lower():
+    if conditional=="Saint":
+      room = "saintpebbles"
+    else:
+      room = "pebbles"
+  for name in aliases[4]:
+    if name[0].lower()==room.lower():
+      room = name[1]
+      break
+  for name in aliases[3]:
+    if name[0].lower()==room.lower():
+      room = name[1]
+      break
+  for shelter in shelters:
+    for contained in shelter[3]:
+      if contained==room:
+        return shelter[1]
+  return("NOT FOUND")
+
 def slugcatpicker(slugcat): #takes in user input and outpits slugcat-relevant variables [list of regions, slugcat in-file name]
   weights = [["SU"], ["HI"], ["CC"], ["SI"], ["LF"], ["SB"], ["GW"], ["VS"]]
   if "surv" in slugcat.lower():
@@ -117,7 +145,30 @@ def loadregion(abbr): #loads the rooms in a region, and then compacts them into 
     pass
   return(shelters)
 
-def conditionalinterpret(shelters, region, fileloc):
+def loadaliases(): #loads the aliases file into memory.
+  aliasfile = open("names.txt", 'r')
+  step = ""
+  REGIONS = []
+  SAINTREGIONS = []
+  INVREGIONS = []
+  SHELTERS = []
+  ROOMS = []
+  while True:
+    line = re.split('\n', aliasfile.readline())[0]
+    if step=="":
+      step = re.split(':', line)[0]
+      continue
+    if step=="END NAMES":
+      break
+    if line=="":
+      step = line
+      continue
+    linesplit = re.split(' - ', line)
+    locals()[step].append(linesplit)
+  return[REGIONS, SAINTREGIONS, INVREGIONS, SHELTERS, ROOMS]
+      
+
+def conditionalinterpret(shelters, region, fileloc): #interprets the 'conditional links' section of the MSC files.
   file = open(fileloc, mode='r')
   test = True
   while True:
@@ -302,6 +353,7 @@ def dijkstra(web, start, target): #runs Dijstra's algorithm to connect a given s
         
 weights = [["SU", .1], ["HI", .1], ["CC", .25], ["GW", .4], ["SH", 1], ["SL", .4], ["UW", .3], ["DS", .25], ["SS", .6], ["LF", .7], ["SB", .7], ["SI", .7], ["OE", .6], ["RM", .9], ["DM", .5], ["MS", 1], ["CL", .5], ["HR", .3], ["LC", .5], ["LM", .4], ["UG", .5], ["VS", .6]] #weights in here are 'defaults' although that's not actually implemented
 conditional = ""
+aliases = loadaliases()
 while True:
   world = []
   while True:
@@ -315,39 +367,45 @@ while True:
       break
   for region in weights:
     world += loadregion(region[0])
+    if conditional=="Saint":
+      for name in aliases[1]:
+        if region[0]==name[0]:
+          regionname = name[1]
+          break
+    elif conditional=="Inv":
+      for name in aliases[2]:
+        if region[0]==name[0]:
+          regionname = name[1]
+          break
+    else:
+      for name in aliases[0]:
+        if region[0]==name[0]:
+          regionname = name[1]
+          break
     while True:
-      temp = input("Please input a difficulty value for "+region[0]+": ")
+      temp = input("Please input a difficulty value for "+regionname+": ")
       if temp.isnumeric():
-        region.append(int(temp))
+        region.append(float(temp))
         break
       else:
         print("That's not a number!")
   world = worldfix(world)
   applyweights(world, weights)
   web = makeweb(world, size)
-  for node in web:
-    print(node)
-    print("\n")
   while True:
     found = False
-    start = input("Input origin shelter name: ")
-    for shelter in world:
-      if start == shelter[1]:
-        found = True
-        break
-    if found:
+    start = input("Input origin room name: ")
+    start = parseroom(start, world, aliases)
+    if not start=="NOT FOUND":
       break
-    print("Shelter name not recognized. Please try again.\n")
+    print("Could not resolve room name. Please try again.\n")
   while True:
     found = False
-    end = input("Input destination shelter name: ")
-    for shelter in world:
-      if end == shelter[1]:
-        found = True
-        break
-    if found:
+    end = input("Input destination room name: ")
+    end = parseroom(end, world, aliases)
+    if not end=="NOT FOUND":
       break
-    print("Shelter name not recognized. Please try again.\n")
+    print("Could not resolve room name. Please try again.\n")
   print(dijkstra(web, start, end))
   if input("type QUIT to exit: ") == "QUIT":
     break
