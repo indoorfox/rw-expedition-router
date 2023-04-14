@@ -71,6 +71,34 @@ UW - The Exterior
 VS - TOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOBS
 
 SHELTERS:
+Tutorial Shelter - SU_S01
+Five Pebbles Topside - SS_S04
+Journey's End - OE_SEXTRA
+Chimney / Sky Islands Gate Shelter - CC_S04
+Precipice Overlook - SL_S13
+Precipice West Edge - LM_S13
+Precipice East Edge - LM_S15
+Precipice Center - LM_S06
+Moon Topside - DM_STOP
+Where the Land Fissures - SB_S09
+Train Shelter - SB_S06
+Filtration's Final Stretch - SB_S01
+Drainage / Filtration Gate Shelter - DS_S03
+Garbage Wastes / Industrial Gate Shelter - GW_S03
+Garbage Wastes / Drainage Gate Shelter - GW_S05
+Garbage Wastes / Shoreline Gate Shelter - GW_S04
+Shaded / Industrial Gate Shelter - SH_S03
+Shaded / Shoreline Gate Shelter - SH_S05
+Pipeyard / Sky Islands Gate Shelter - VS_S09
+Shoreline / Submerged Gate Shelter - SL_S15
+Shoreline / Shaded Gate Shelter - SL_S02
+Sky Islands / Farm Arrays Gate Shelter - SI_S03
+Farm Arrays / Subterranean Gate Shelter - LF_S04
+Pumping Station - OE_S03
+Treetop Shelter - OE_SFINAL
+End of the Aerie - MS_S07
+Start of the Aerie - MS_S10
+Bitter Aerie - MS_bittershelter
 
 ROOMS:
 White - SU_C04
@@ -85,6 +113,21 @@ tutorial - SU_C04
 moon - SL_AI
 spearmoon - DM_AI
 pebbles - SS_AI
+rivpebbles - RM_AI
 saintpebbles - CL_AI
+heart - MS_CORE
+void - SB_L01
+spades - CC_C12
+grains - UW_A14
+beads - LF_B01
+sprouts - SB_A10
+droplets - SI_B11
+needles - SH_A08
+tower - LC_highestpoint
+comms - SI_A07
+kingscav - LC_FINAL
+home tree - OE_FINAL03
+core - RM_CORE
+cloak - MS_FARSIDE
 
 END NAMES
