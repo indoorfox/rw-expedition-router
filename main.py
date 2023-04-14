@@ -1,15 +1,16 @@
 import re
 import os
-rw_data = input("Input the path to your RainWorld_Data directory (including the folder itself) : ")
+rw_data = input("Input the path to your RainWorld_Data directory (including the folder itself) :")
 reg_world = os.path.join(rw_data, "StreamingAssets", "world")
 msc_world = os.path.join(rw_data, "StreamingAssets", "mods", "moreslugcats", "world")
 msc_modify = os.path.join(rw_data, "StreamingAssets", "mods", "moreslugcats", "modify", "world")
 world = []
-size = True #Should the program take number of rooms into account when pathing?
 
 def parseroom(room, shelters, aliases): #interprets room input as a shelter
   if 'start' in room.lower():
     room = conditional
+  if 'goal' in room.lower():
+    room = conditional+"goal"
   if 'moon' in room.lower() or 'lttm' in room.lower():
     if conditional=="Spear":
       room = "spearmoon"
@@ -262,6 +263,21 @@ def expand(shelters, region): #expands the search boundary for each shelter zone
     numsearching += len(newboundary) #keeping track of how many rooms are in the next iteration so we don't have to go through any empty ones.
   return(numsearching != 0)
 
+def conditionalstitch(world, conditional): #stitches together a few specific one-way connections that only sometimes exist. Not super happy I have to hardcode these, but they don't exist in the world_[region].txt files, which is the only thing we look at.
+  if(conditional=="Saint"):
+    for shelter in world:
+      if shelter[1]=="SB_S01":
+        shelter[4].append("HR_S02") #adds the entrance to Rubicon for Saint.
+  if(conditional=="Rivulet"):
+    for shelter in world:
+      if shelter[1]=="MS_S05":
+        shelter[4].append("MS_S10") #adds the entrance to Bitter Aerie after putting in the Rarefaction Cell as Rivulet.
+  if(conditional=="White" or conditional=="Yellow" or conditional=="Gourmand"):
+    for shelter in world:
+      if shelter[1]=="OE_EXSHELTER":
+        shelter[4].append("OE_S03") #adds the fall down to pump station in Outer Expanse for slugcats that can reach it.
+  return world
+
 def worldfix(world): #stitches together the regions by connecting the shelters that share a gate.
   for shelter in world:
     index = -1
@@ -359,10 +375,30 @@ aliases = loadaliases()
 while True:
   world = []
   while True:
+    sizeq = input("Should the program use shelter size as a factor for pathing? Y/N:")
+    if 'y' in sizeq.lower():
+      size = True
+      break
+    if 'n' in sizeq.lower():
+      size = False
+      break
+    print("Please answer the question with 'Y' or 'N'.")
+  while True:
+    weightq = input("Would you like to use equal weighting? Y/N:")
+    if 'y' in weightq.lower():
+      equalweights = True
+      break
+    if 'n' in weightq.lower():
+      equalweights = False
+      break
+    print("Please answer the question with 'Y' or 'N'.")
+  while True:
     slugcat = input("Which slugcat are you playing as?")
     temp = slugcatpicker(slugcat)
     weights = temp[0]
     conditional = temp[1]
+    if conditional == "Inv":
+      print("Heads up - unless someone has made a mod that lets you play an Enot expedition, this probably isn't gonna be super useful to you.\nEnot is *weird*, and difficulties are going to be all out of wack from what you're used to.")
     if conditional == "UNRECOGNIZED":
       print("Sorry, I don't recognize that slugcat.")
     else:
@@ -385,6 +421,9 @@ while True:
           regionname = name[1]
           break
     while True:
+      if equalweights:
+        region.append(1)
+        break
       temp = input("Please input a difficulty value for "+regionname+": ")
       if temp.isnumeric():
         region.append(float(temp))
@@ -392,6 +431,7 @@ while True:
       else:
         print("That's not a number!")
   world = worldfix(world)
+  world = conditionalstitch(world, conditional)
   applyweights(world, weights)
   web = makeweb(world, size)
   while True:
