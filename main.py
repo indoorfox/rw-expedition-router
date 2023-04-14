@@ -18,6 +18,8 @@ def parseroom(room, shelters, aliases): #interprets room input as a shelter
   if 'pebbles' in room.lower() or 'fp' in room.lower():
     if conditional=="Saint":
       room = "saintpebbles"
+    elif conditional=="Rivulet":
+      room = "rivpebbles"
     else:
       room = "pebbles"
   for name in aliases[4]:
@@ -394,18 +396,30 @@ while True:
   web = makeweb(world, size)
   while True:
     found = False
-    start = input("Input origin room name: ")
-    start = parseroom(start, world, aliases)
+    rawstart = input("Input origin room name: ")
+    start = parseroom(rawstart, world, aliases)
     if not start=="NOT FOUND":
       break
     print("Could not resolve room name. Please try again.\n")
   while True:
     found = False
-    end = input("Input destination room name: ")
-    end = parseroom(end, world, aliases)
+    rawend = input("Input destination room name: ")
+    end = parseroom(rawend, world, aliases)
     if not end=="NOT FOUND":
       break
     print("Could not resolve room name. Please try again.\n")
-  print(dijkstra(web, start, end))
+  route = dijkstra(web, start, end)
+  for stop in route:
+    if stop==end:
+      print(rawend)
+      break
+    if stop==start:
+      print(rawstart, end=' -> ')
+    else:
+      for name in aliases[3]:
+        if name[1]==stop:
+          stop = name[0]
+          break
+      print(stop, end=' -> ')   
   if input("type QUIT to exit: ") == "QUIT":
     break
